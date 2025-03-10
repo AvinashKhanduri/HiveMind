@@ -1,0 +1,102 @@
+General Spring Boot Core Concepts
+Spring Boot Basics:
+
+Setting up a Spring Boot application.
+Dependency Injection.
+Configuration using application.properties or application.yml.
+Spring Web:
+
+RESTful API development with Spring MVC (@Controller, @RestController, @RequestMapping).
+Handling GET, POST, PUT, DELETE requests.
+Spring Data MongoDB:
+
+Defining repositories (@Repository).
+Querying data using MongoRepository and @Query annotation.
+Aggregation pipelines for advanced queries.
+Using indexes to optimize queries.
+Authentication & Security
+JWT (JSON Web Token):
+
+Setting up user authentication with JWT.
+Generating and validating tokens.
+Securing APIs using @PreAuthorize and @Secured.
+Spring Security:
+
+Role-based access control (e.g., Admin, Student, Mentor).
+Password encryption (e.g., BCryptPasswordEncoder).
+OAuth2 (Optional):
+
+Enabling third-party login with Google, GitHub, or other providers.
+File and Image Management
+File Uploads:
+
+Uploading files (images, documents) using MultipartFile.
+Configuring file storage in a local directory or cloud storage (e.g., AWS S3).
+File Deletion:
+
+Implementing APIs to delete files from storage.
+Serving Static Content:
+
+Serving images/files via REST API endpoints or directly.
+Real-Time Communication
+WebSockets:
+Setting up real-time communication for team chats.
+Using Spring WebSocket with @EnableWebSocket and @MessageMapping.
+Search & Filtering
+Custom Queries:
+
+Writing custom MongoDB queries using @Query.
+Pagination and sorting with Pageable.
+Text Indexing and Search:
+
+Using text indexes in MongoDB for searching profiles, posts, and teams.
+Notifications
+Event-Driven Programming:
+
+Using Spring Events to trigger notifications.
+Publishing and subscribing to events.
+Push Notifications (Optional):
+
+Implementing push notifications via Firebase or WebSocket.
+Project and Team Management
+Task Management APIs:
+
+CRUD operations for tasks and milestones.
+Relating tasks to specific teams and users.
+Dashboard Aggregation:
+
+Using MongoDB aggregation for project progress tracking.
+Testing
+Unit Testing:
+
+Writing tests with JUnit and Mockito.
+Testing service layers and controllers.
+Integration Testing:
+
+Setting up integration tests for end-to-end functionality.
+Deployment
+Docker:
+
+Containerizing the Spring Boot application for easy deployment.
+Cloud Deployment:
+
+Deploying the application on cloud platforms like AWS, GCP, or Heroku.
+Additional Concepts
+Email Sending:
+
+Sending emails using Spring Mail (e.g., for notifications).
+Swagger/OpenAPI:
+
+Documenting your APIs for better collaboration and testing.
+Caching (Optional):
+
+Improving performance using caching with Spring Cache and Redis.
+Scheduled Tasks:
+
+Using @Scheduled for periodic background tasks like sending reminders.
+Learning Plan
+Phase 1: Core Spring Boot (Basics, REST APIs, Spring Data MongoDB).
+Phase 2: Security (JWT, Spring Security, Role-based access).
+Phase 3: Advanced Features (WebSockets, File Management, Notifications).
+Phase 4: Deployment and Optimization (Docker, Caching, Cloud).
+Let me know if you want further details or tutorials on any of these topics!
