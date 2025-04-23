@@ -64,44 +64,24 @@
 		</dependency>
 
 <!--		jwt dependency -->
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.11.5</version>
+			<version>0.12.5</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.11.5</version>
-			<scope>runtime</scope>
+			<version>0.12.5</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.11.5</version>
-			<scope>runtime</scope>
+			<version>0.12.5</version>
 		</dependency>
 
 
-		<!--      __________keycloak admin rest client _______
-		The Keycloak Admin REST Client (org.keycloak:keycloak-admin-client) is a Java client library that allows your
-			spring Boot application to interact with Keycloak’s Admin REST API programmatically.
- 			It helps manage users, roles, clients, realms, and more from your backend.
--->
-		<dependency>
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-admin-client</artifactId>
-			<version>26.0.1</version>
-		</dependency>
-
-		<!--		OAuth2 Dependencies  -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
-		</dependency>
-
-
-<!--		MapStruct is a Java annotation-based code generator for object mapping. It automates field mapping and allows ignoring null values.-->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
@@ -113,6 +93,9 @@
 			<version>1.5.5.Final</version>
 			<scope>provided</scope>
 		</dependency>
+
+
+
 
 
 

@@ -128,20 +128,27 @@ public class ManageTeam {
 
 
     public ResponseEntity<?> getMyTeamMembers() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User teamLeader = userRepository.findByUserName(authentication.getName());
+       try{
+           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+           System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+           User teamLeader = userRepository.findByEmail(authentication.getName());
+           System.out.println(teamLeader.getName());
 
-        Team myTeam = teamLeader.getTeam();
-        List<TeamMembersResponse> teamMembers = myTeam.getTeamMembers().stream().map(teamMember ->
-                new TeamMembersResponse(
-                        teamMember.getId(),
-                        teamMember.getName(),
-                        teamMember.getPhoneNumber(),
-                        teamMember.getEmail(),
-                        teamMember.getSkills()
-                )
-        ).toList();
-        return ResponseEntity.ok().body(teamMembers);
+           Team myTeam = teamLeader.getTeam();
+           List<TeamMembersResponse> teamMembers = myTeam.getTeamMembers().stream().map(teamMember ->
+                   new TeamMembersResponse(
+                           teamMember.getId(),
+                           teamMember.getName(),
+                           teamMember.getPhoneNumber(),
+                           teamMember.getEmail(),
+                           teamMember.getSkills()
+                   )
+           ).toList();
+           return ResponseEntity.ok().body(teamMembers);
+       }
+       catch (NullPointerException e){
+           return ResponseEntity.notFound().build();
+       }
     }
 
 

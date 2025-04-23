@@ -1,10 +1,7 @@
 package com.avinash.HiveMind.services.user;
 
 
-import com.avinash.HiveMind.dto.authentication.PasswordEmailDto;
-import com.avinash.HiveMind.dto.authentication.RegisterUserDto;
-import com.avinash.HiveMind.dto.authentication.ResetPasswordDto;
-import com.avinash.HiveMind.dto.authentication.VerifyUserDto;
+import com.avinash.HiveMind.dto.authentication.*;
 import com.avinash.HiveMind.dto.team.JoinTeamRequestDto;
 import com.avinash.HiveMind.dto.user.ConnectionDto;
 import com.avinash.HiveMind.dto.user.ConnectionRequestResponseDto;
@@ -17,6 +14,7 @@ import com.avinash.HiveMind.repositorys.ConnectionRepository;
 import com.avinash.HiveMind.repositorys.NotificationRepository;
 import com.avinash.HiveMind.repositorys.TeamRepository;
 import com.avinash.HiveMind.repositorys.UserRepository;
+import com.avinash.HiveMind.response.authentication.LoginResponse;
 import com.avinash.HiveMind.response.authentication.RegisterResponse;
 import com.avinash.HiveMind.response.user.ConnectionRequestResponse;
 import com.avinash.HiveMind.response.user.MyRequestResponse;
@@ -24,20 +22,17 @@ import com.avinash.HiveMind.response.user.SearchUserResult;
 import com.avinash.HiveMind.response.user.TeamCreationResponse;
 import com.avinash.HiveMind.services.NotificationService;
 import com.avinash.HiveMind.utils.Emails;
+import com.avinash.HiveMind.utils.JwtServices;
 import com.avinash.HiveMind.utils.Support;
-import org.bson.types.ObjectId;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.RolesResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.jose.jwk.JWK;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,6 +46,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServices {
+    private static final Logger log = LoggerFactory.getLogger(UserServices.class);
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -73,19 +69,13 @@ public class UserServices {
     @Autowired
     private NotificationService notificationService;
 
-//    @Autowired
-//    private Keycloak keycloak;
-//
-//    @Value("${keycloak.realm}")
-//    private String realm;
-//
-//    private UsersResource getUsersResources(){
-//        return  keycloak.realm(realm).users();
-//    }
-//
-//    private RolesResource getRoleResource(){
-//        return keycloak.realm(realm).roles();
-//    }
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtServices jwtServices;
+
+
     public ResponseEntity<?> findUserBySkill(String skill) {
         if (userRepository.findUserBySkills(skill).isEmpty()) {
             return ResponseEntity.ok("No user found");
@@ -468,6 +458,41 @@ public class UserServices {
             return ResponseEntity.ok("Password updated successfully");
         }
         return ResponseEntity.badRequest().body("user not found");
+    }
+
+
+    public ResponseEntity<?> login(LoginUserDto loginUserDto){
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(),loginUserDto.getPassword())
+            );
+
+            User user = userRepository.findByEmail(loginUserDto.getEmail());
+            String jwtToken = jwtServices.generateToken(user);
+            String refreshToken = jwtServices.generateRefresh(new HashMap<>(),user);
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setJwtToken(jwtToken);
+            loginResponse.setRefreshToken(refreshToken);
+            return ResponseEntity.ok(loginResponse);
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    public ResponseEntity<?> refereshToken(String refereshToken){
+        try{
+            User user = userRepository.findByEmail(jwtServices.getEmailFromToken(refereshToken));
+            String jwtToken = jwtServices.generateToken(user);
+            String newRefereshToken = jwtServices.generateRefresh(new HashMap<>(),user);
+            LoginResponse authenticationResponse = new LoginResponse();
+            authenticationResponse.setRefreshToken(newRefereshToken);
+            authenticationResponse.setJwtToken(jwtToken);
+            return ResponseEntity.ok(authenticationResponse);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
 

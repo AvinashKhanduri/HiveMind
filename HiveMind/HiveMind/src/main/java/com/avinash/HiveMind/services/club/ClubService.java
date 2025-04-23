@@ -14,7 +14,7 @@ import com.avinash.HiveMind.repositorys.ClubRepository;
 import com.avinash.HiveMind.repositorys.EventRepository;
 import com.avinash.HiveMind.repositorys.UserRepository;
 import org.bson.types.ObjectId;
-import org.keycloak.jose.jwk.JWK;
+//import org.keycloak.jose.jwk.JWK;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

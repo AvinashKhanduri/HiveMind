@@ -1,9 +1,6 @@
 package com.avinash.HiveMind.utils;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,13 +38,6 @@ public class Support {
         return null;
     }
 
-    public String getCurrentLogedInUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
-            Jwt jwt = jwtAuth.getToken();
-            return jwt.getClaim("sub");
-        }
-        return "No user authenticated";
-    }
+
 
 }

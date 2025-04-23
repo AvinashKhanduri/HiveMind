@@ -58,15 +58,6 @@ public class UserController {
     }
 
 
-//    @GetMapping("/me")
-//    public String getCurrentUserId() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
-//            Jwt jwt = jwtAuth.getToken();
-//            return "Authenticated User ID: " + jwt.getClaim("sub");
-//        }
-//        return "No user authenticated";
-//    }
 
 
     @PutMapping("/update-profile")

@@ -1,7 +1,7 @@
 package com.avinash.HiveMind.dto.authentication;
 
 public class LoginUserDto {
-    private String email;
+        private String email;
     private String password;
 
     public String getEmail() {

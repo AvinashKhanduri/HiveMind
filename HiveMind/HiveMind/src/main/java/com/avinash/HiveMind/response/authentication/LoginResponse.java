@@ -1,13 +1,11 @@
 package com.avinash.HiveMind.response.authentication;
 
 public class LoginResponse {
-    public LoginResponse(String jwtToken, String verificationCodeExpireAt) {
-        this.jwtToken = jwtToken;
-        this.verificationCodeExpireAt = verificationCodeExpireAt;
-    }
+
 
     private String jwtToken;
     private String verificationCodeExpireAt;
+    private String refreshToken;
 
     public String getJwtToken() {
         return jwtToken;
@@ -23,5 +21,13 @@ public class LoginResponse {
 
     public void setVerificationCodeExpireAt(String verificationCodeExpireAt) {
         this.verificationCodeExpireAt = verificationCodeExpireAt;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
