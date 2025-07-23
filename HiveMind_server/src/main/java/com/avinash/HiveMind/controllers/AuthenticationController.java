@@ -4,6 +4,7 @@ package com.avinash.HiveMind.controllers;
 import com.avinash.HiveMind.dto.authentication.*;
 //import com.avinash.HiveMind.services.user.KeyCloakUserService;
 import com.avinash.HiveMind.services.user.UserServices;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,8 @@ public class AuthenticationController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserDto loginUserDto){
-        return mongoUserService.login(loginUserDto);
+    public ResponseEntity<?> login(@RequestBody LoginUserDto loginUserDto, HttpServletResponse httpServletResponse){
+        return mongoUserService.login(loginUserDto,httpServletResponse);
     }
 
     @PostMapping("/refresh/{refresh_token}")
@@ -60,6 +61,7 @@ public class AuthenticationController {
     public ResponseEntity<?> resetNewPassword(@RequestBody ResetPasswordDto resetPasswordDto){
         return mongoUserService.updatePassword(resetPasswordDto);
     }
+
 
 
 

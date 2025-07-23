@@ -6,6 +6,7 @@ import com.mongodb.lang.NonNull;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,24 +36,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+
+
 //        final String authHeader = request.getHeader("Authorization");
 //        final String jwt;
 //        final String userEmail;
-//
-//        if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, "Bearer ")) {
+
+//        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
 //            filterChain.doFilter(request, response);
 //            return;
 //        }
+//        jwt = authHeader.substring(7);//Bearer length is 7
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail;
 
-        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
+        String jwt = null;
+        String userEmail = null;
+        if(request.getCookies()!=null){
+            for(Cookie cookie:request.getCookies()){
+                if(cookie.getName().equals("access_token")){
+                    jwt = cookie.getValue();
+                }
+            }
+        }
+
+        if(jwt == null){
             filterChain.doFilter(request, response);
             return;
         }
-        jwt = authHeader.substring(7);//Bearer length is 7
+
+
+
         userEmail = jwtServices.extractUserName(jwt);//todo extract userEmail from jwt Token
         if (StringUtils.isNotEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);

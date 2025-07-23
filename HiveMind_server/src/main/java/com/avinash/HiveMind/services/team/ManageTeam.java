@@ -147,7 +147,7 @@ public class ManageTeam {
            return ResponseEntity.ok().body(teamMembers);
        }
        catch (NullPointerException e){
-           return ResponseEntity.notFound().build();
+           return ResponseEntity.ok("No members");
        }
     }
 

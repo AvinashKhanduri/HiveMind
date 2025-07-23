@@ -16,22 +16,22 @@ import com.avinash.HiveMind.repositorys.TeamRepository;
 import com.avinash.HiveMind.repositorys.UserRepository;
 import com.avinash.HiveMind.response.authentication.LoginResponse;
 import com.avinash.HiveMind.response.authentication.RegisterResponse;
-import com.avinash.HiveMind.response.user.ConnectionRequestResponse;
-import com.avinash.HiveMind.response.user.MyRequestResponse;
-import com.avinash.HiveMind.response.user.SearchUserResult;
-import com.avinash.HiveMind.response.user.TeamCreationResponse;
+import com.avinash.HiveMind.response.user.*;
 import com.avinash.HiveMind.services.CloudinaryService;
 import com.avinash.HiveMind.services.NotificationService;
 import com.avinash.HiveMind.utils.Emails;
 import com.avinash.HiveMind.utils.JwtServices;
 import com.avinash.HiveMind.utils.Support;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.mapstruct.control.MappingControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,6 +83,9 @@ public class UserServices {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    @Value("${jwt.cookieExpiry}")
+    private String cookieExpiry;
+
     public ResponseEntity<?> findUserBySkill(String skill) {
         if (userRepository.findUserBySkills(skill).isEmpty()) {
             return ResponseEntity.ok("No user found");
@@ -116,7 +120,7 @@ public class UserServices {
     public ResponseEntity<?> sendConnectionRequest(ConnectionDto connectionDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User from = userRepository.findByUserName(authentication.getName());
+        User from = userRepository.findByEmail(authentication.getName());
         System.out.println("sender id --> " + from.getId());
         User to = userRepository.findById(connectionDto.getTo());
         System.out.println("receiver id -> " + to.getId());
@@ -467,7 +471,7 @@ public class UserServices {
     }
 
 
-    public ResponseEntity<?> login(LoginUserDto loginUserDto){
+    public ResponseEntity<?> login(LoginUserDto loginUserDto, HttpServletResponse httpServletResponse){
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(),loginUserDto.getPassword())
@@ -476,10 +480,34 @@ public class UserServices {
             User user = userRepository.findByEmail(loginUserDto.getEmail());
             String jwtToken = jwtServices.generateToken(user);
             String refreshToken = jwtServices.generateRefresh(new HashMap<>(),user);
-            LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setJwtToken(jwtToken);
-            loginResponse.setRefreshToken(refreshToken);
-            return ResponseEntity.ok(loginResponse);
+
+            ResponseCookie responseCookie = ResponseCookie.from("access_token",jwtToken)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(Duration.ofMinutes(30))
+                    .build();
+            httpServletResponse.addHeader(HttpHeaders.SET_COOKIE,responseCookie.toString());
+
+            LoginResponse response = new LoginResponse();
+
+            // Set JWT tokens
+            response.setRefreshToken(Optional.ofNullable(refreshToken).orElse(""));
+
+            // Set user details
+            response.setFirstname(Optional.ofNullable(user.getFirstName()).orElse(""));
+            response.setLastname(Optional.ofNullable(user.getLastName()).orElse(""));
+            response.setProfilePictureUrl(Optional.ofNullable(user.getProfilePictureUrl()).orElse(""));
+            response.setEmail(Optional.ofNullable(user.getEmail()).orElse(""));
+            response.setPhoneNumber(Optional.ofNullable(user.getPhoneNumber()).orElse(""));
+
+            // Use Optional to avoid null checks and set defaults for lists
+            response.setRoles(Optional.ofNullable(user.getRoles()).orElse(new ArrayList<>()));
+            response.setSkills(Optional.ofNullable(user.getSkills()).orElse(new ArrayList<>()));
+            response.setAchievements(Optional.ofNullable(user.getAchievements()).orElse(new ArrayList<>()));
+            response.setSocialMedia(Optional.ofNullable(user.getSocialMedia()).orElse(new ArrayList<>()));
+
+            return ResponseEntity.ok(response);
 
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -605,6 +633,19 @@ public class UserServices {
             System.out.println("can not found user");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    public  ResponseEntity<?> getAllNotifications(){
+       try{
+           User user = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+           List<ConnectionRequest> connectionRequests = user.getConnectionRequests();
+           List<NotificationsResponse> responses = connectionRequests.stream().map(
+                   notification -> new NotificationsResponse(notification.getFrom().getName(),notification.getTo().getName(),notification.getFrom().getProfilePictureUrl(),notification.getId().toString())
+           ).toList();
+           return ResponseEntity.ok(responses);
+       }catch (Exception e){
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
     }
 
 

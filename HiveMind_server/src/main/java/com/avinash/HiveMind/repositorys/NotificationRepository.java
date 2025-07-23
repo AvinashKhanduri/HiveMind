@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -29,5 +30,9 @@ public class NotificationRepository {
 
     public void deleteNotification(Notification notification){
         mongoTemplate.remove(notification);
+    }
+
+    public List<Notification> getAllNotifications(){
+        return mongoTemplate.findAll(Notification.class);
     }
 }

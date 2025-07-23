@@ -8,6 +8,7 @@ import com.avinash.HiveMind.services.NotificationService;
 import com.avinash.HiveMind.services.user.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -19,6 +20,8 @@ import java.io.IOException;
 public class UserController {
     @Autowired
     private UserServices userServices;
+
+
 
 
 
@@ -63,6 +66,8 @@ public class UserController {
 
 
 
+
+
     @PutMapping("/update-profile")
     public ResponseEntity<?> updateProfile(@RequestBody UpdateUserDto updateUserDto){
         return userServices.updateProfile(updateUserDto);
@@ -88,6 +93,17 @@ public class UserController {
 
             return userServices.deleteProfilePicture();
 
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<?> getAllNotifications(){
+        return userServices.getAllNotifications();
+    }
+
+
+    @GetMapping("/me")
+    public String getMe(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 

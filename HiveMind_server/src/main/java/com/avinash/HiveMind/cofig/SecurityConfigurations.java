@@ -39,7 +39,7 @@ public class SecurityConfigurations {
         return http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                                .requestMatchers( "/auth/**","/healthCheck/**").permitAll() // Allow unauthenticated access to /auth/**
+                                .requestMatchers( "/auth/**","/healthCheck/**","/public/**").permitAll()
                                 .requestMatchers("/admin/**").hasAuthority(User.UserRole.ADMIN.name())
                                 .requestMatchers("/team/**").hasAuthority(User.UserRole.TEAM_LEADER.name())
                                 .requestMatchers("/club/**").hasAuthority(User.UserRole.TEAM_LEADER.name())
