@@ -12,7 +12,23 @@ import AuthenticationPage from './pages/Authentication.jsx'
 import EditMemberPage from './components/Teams/EditMemberpage.jsx'
 import Teamspage from './pages/TeamsPage.jsx'
 import TeamDetailPage from './components/Teams/TeamsDetailPage.jsx'
-import ProjectDetailPage from './pages/ProjectDetailPage.jsx'
+import ProjectManagementPage from './pages/ProjectManagementPage.jsx'
+import SearchPage from './pages/SearchPage.jsx'
+import UserProfile from './pages/UserProfilePage.jsx'
+
+const mockUser = {
+  name: "Alex Johnson",
+  university: "Tech University",
+  department: "Computer Science",
+  profilePic: "https://example.com/profile.jpg",
+  skills: ["React", "Node.js", "UI/UX"],
+  projects: [
+    { name: "Hackathon 2024", description: "Winner of best AI project" },
+    { name: "E-Learning Platform", description: "Group project for DB course" },
+  ],
+  currentTeam: { name: "Code Innovators", role: "Frontend Lead" },
+};
+
 
 const router = createBrowserRouter([
   {
@@ -47,7 +63,15 @@ const router = createBrowserRouter([
       },
        {
         path:"project-detail",
-        element:<ProjectDetailPage/>
+        element:<ProjectManagementPage/>
+      },
+      {
+        path:"search-page",
+        element:<SearchPage/>
+      },
+      {
+        path:"user-profile",
+        element:<UserProfile user={mockUser}/>
       }
     ]
   },
