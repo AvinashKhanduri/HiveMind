@@ -15,6 +15,7 @@ import TeamDetailPage from './components/Teams/TeamsDetailPage.jsx'
 import ProjectManagementPage from './pages/ProjectManagementPage.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import UserProfile from './pages/UserProfilePage.jsx'
+import UsersPage from './pages/UsersPage.jsx'
 
 const mockUser = {
   name: "Alex Johnson",
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
       {
         path:"user-profile",
         element:<UserProfile user={mockUser}/>
+      },
+      {
+        path:"users-page",
+        element:<UsersPage/>
       }
     ]
   },

@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback } from 'react';
 import {
   Box, Drawer as MuiDrawer, AppBar as MuiAppBar, Toolbar, List,
   CssBaseline, Typography, IconButton, ListItem, ListItemButton,
-  ListItemIcon, ListItemText, Stack, Avatar, Button, styled, useTheme
+  ListItemIcon, ListItemText, Stack, Avatar, Button, styled, useTheme, Tooltip
 } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -21,7 +21,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import StadiumIcon from '@mui/icons-material/Stadium';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { FaUserFriends } from "react-icons/fa";
 
 const drawerWidth = 240;
 
@@ -66,13 +67,13 @@ const Drawer = styled(MuiDrawer, {
   boxSizing: 'border-box',
   ...(open
     ? {
-        ...openedMixin(theme),
-        '& .MuiDrawer-paper': openedMixin(theme),
-      }
+      ...openedMixin(theme),
+      '& .MuiDrawer-paper': openedMixin(theme),
+    }
     : {
-        ...closedMixin(theme),
-        '& .MuiDrawer-paper': closedMixin(theme),
-      }),
+      ...closedMixin(theme),
+      '& .MuiDrawer-paper': closedMixin(theme),
+    }),
 }));
 
 export default function AppDrawer() {
@@ -85,6 +86,10 @@ export default function AppDrawer() {
   const handleProfileIconClick = useCallback((e) => setAnchorEl(e.currentTarget), []);
   const handleClose = useCallback(() => setAnchorEl(null), []);
 
+  const location = useLocation();
+
+
+
   const icons = useMemo(() => ({
     Home: <HomeFilledIcon />,
     Events: <EmojiEventsIcon />,
@@ -92,7 +97,8 @@ export default function AppDrawer() {
     Teams: <GroupsIcon />,
     MyTeam: <HandshakeIcon />,
     Club: <StadiumIcon />,
-    MyProfile: <PersonOutlineIcon />
+    MyProfile: <PersonOutlineIcon />,
+    Connect: <FaUserFriends />
   }), []);
 
   const drawerRoutes = useMemo(() => ({
@@ -103,20 +109,27 @@ export default function AppDrawer() {
     Login: '/auth',
     MyTeam: '/my-team',
     Search: '/search-page',
-    MyProfile:"/user-profile"
+    MyProfile: "/user-profile",
+    Connect: "/users-page"
   }), []);
 
-  const navItems = ['Home', 'Events', 'Teams', 'MyTeam', 'Club', 'Search', 'MyProfile'];
+  const currentPageName = useMemo(() => {
+    const path = location.pathname;
+    const routeEntry = Object.entries(drawerRoutes).find(([, route]) => route === path);
+    return routeEntry ? routeEntry[0] : '';
+  }, [location.pathname, drawerRoutes]);
+
+  const navItems = ['Home', 'Events', 'Teams', 'MyTeam', 'Club', 'Search', 'MyProfile', 'Connect'];
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open} className="bg-transparent backdrop-blur-2xl" sx={{
-    backgroundColor: 'transparent',
-    backdropFilter: 'blur(20px)', // Or use 'blur(12px)' as per design
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-  }} elevation={10}>
+        backgroundColor: 'transparent',
+        backdropFilter: 'blur(20px)', // Or use 'blur(12px)' as per design
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+      }} elevation={10}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -128,6 +141,43 @@ export default function AppDrawer() {
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1, color: 'white', fontFamily: 'IBM Plex Mono' }}>
             {/* Dynamic title */}
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 3,
+                mt: 2,
+                position: 'relative',
+                display: 'inline-block',
+                // fontFamily: 'IBM Plex Mono, monospace',
+                fontWeight: 700,
+                fontSize: '1.8rem',
+                background: 'linear-gradient(to right, #e0e7ff, #a5b4fc, #6366f1)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: '0',
+                  width: '100%',
+                  height: '3px',
+                  background: 'linear-gradient(to right, #6366f1, #a5b4fc)',
+                  borderRadius: '2px',
+                  transform: 'scaleX(0.8)',
+                  transformOrigin: 'left',
+                  transition: 'transform 0.3s ease'
+                },
+                '&:hover': {
+                  '&:after': {
+                    transform: 'scaleX(1)'
+                  }
+                }
+              }}
+            >
+              {currentPageName}
+            </Typography>
           </Typography>
           <Stack direction="row" gap={2}>
             <Avatar sx={{ bgcolor: 'red' }} onClick={handleProfileIconClick}>A</Avatar>
@@ -158,16 +208,8 @@ export default function AppDrawer() {
         {open && <Divider sx={{ borderColor: 'white' }} />}
 
         <List>
-          {navItems.map((text) => (
-            <ListItem key={text} component={NavLink} to={drawerRoutes[text]} disablePadding
-              sx={{
-                display: 'block',
-                '&:hover': {
-                  backgroundColor: '#444f78',
-                  borderRadius: '10px',
-                },
-              }}
-            >
+          {navItems.map((text) => {
+            const listItemContent = (
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -191,10 +233,100 @@ export default function AppDrawer() {
                 >
                   {icons[text]}
                 </ListItemIcon>
-                {open && <ListItemText primary={text} sx={{ fontFamily: 'IBM Plex Mono' }} />}
+                {open && (
+                  <ListItemText
+                    primary={text}
+                    sx={{
+                      fontFamily: 'IBM Plex Mono',
+                    }}
+                  />
+                )}
               </ListItemButton>
-            </ListItem>
-          ))}
+            );
+
+            return (
+              <ListItem
+                key={text}
+                component={NavLink}
+                to={drawerRoutes[text]}
+                disablePadding
+                sx={{
+                  display: 'block',
+                  '&:hover': {
+                    backgroundColor: '#444f78',
+                    borderRadius: '10px',
+                  },
+                }}
+              >
+                {open ? (
+                  listItemContent
+                ) : (
+                  <Tooltip
+                    title={
+                      <span style={{
+                        fontFamily: 'IBM Plex Mono, monospace',
+                        fontSize: '0.85rem',
+                        color: '#e0f2fe'
+                      }}>
+                        {text}
+                      </span>
+                    }
+                    placement="right"
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          bgcolor: 'rgba(15, 23, 42, 0.95)', // slate-900 with opacity
+                          backdropFilter: 'blur(4px)',
+                          border: '1px solid rgba(59, 130, 246, 0.3)', // blue-500 border
+                          borderRadius: '6px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                          px: 2,
+                          py: 1
+                        }
+                      },
+                      arrow: {
+                        sx: {
+                          color: 'rgba(15, 23, 42, 0.95)',
+                          '&:before': {
+                            border: '1px solid rgba(59, 130, 246, 0.3)'
+                          }
+                        }
+                      }
+                    }}
+                    enterDelay={300}
+                    leaveDelay={200}
+                    enterTouchDelay={100}
+                    TransitionProps={{
+                      timeout: { enter: 300, exit: 150 },
+                      style: {
+                        transformOrigin: 'left center',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }
+                    }}
+                  >
+                    {React.cloneElement(listItemContent, {
+                      style: {
+                        transition: 'all 0.2s ease',
+                        ...listItemContent.props.style
+                      },
+                      onMouseEnter: (e) => {
+                        // e.currentTarget.style.transform = 'translateX(4px)';
+                        if (listItemContent.props.onMouseEnter) {
+                          listItemContent.props.onMouseEnter(e);
+                        }
+                      },
+                      onMouseLeave: (e) => {
+                        e.currentTarget.style.transform = 'translateX(0)';
+                        if (listItemContent.props.onMouseLeave) {
+                          listItemContent.props.onMouseLeave(e);
+                        }
+                      }
+                    })}
+                  </Tooltip>
+                )}
+              </ListItem>
+            );
+          })}
         </List>
 
         <List>
@@ -235,6 +367,7 @@ export default function AppDrawer() {
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
+
         <Outlet />
       </Box>
     </Box>
