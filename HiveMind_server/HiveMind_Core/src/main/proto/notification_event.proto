@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package notification;
+
+option java_multiple_files = true;
+
+enum NotificationType {
+    TEAM_REQUEST = 0;
+    CONNECTION_REQUEST = 1;
+    GROUP_CHAT = 2;
+    TWO_PERSON_CHAT = 3;
+    JOIN_TEAM_REQUEST = 4;
+    TASK_NOTIFICATION = 5;
+    AUTH = 6;
+    PASSWORD_RESET = 7;
+    CONNECTION_REQUEST_ACCEPTED = 8;
+    CONNECTION_REQUEST_REJECTED = 9;
+}
+
+enum NotificationStatus{
+    READ = 0;
+    UNWATCHED = 1;
+}
+
+message NotificationEvent {
+    string notification_id = 1;
+    NotificationType type = 2;
+    string title = 3;
+    string message = 4;
+    NotificationStatus status = 5;
+    string from = 7;
+    string to = 8;
+    string sender_name = 9;
+    string receiver_name = 10;
+    string sender_email = 11;
+    string receiver_email = 12;
+}
